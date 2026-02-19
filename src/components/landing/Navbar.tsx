@@ -32,8 +32,8 @@ export default function Navbar() {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3 group">
           <div className="relative">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-rosa-600 to-rosa-800 flex items-center justify-center shadow-md shadow-rosa-800/20 group-hover:shadow-rosa-800/30 transition-all duration-500 group-hover:scale-105">
-              <span className="text-crema-50 font-bold text-lg font-[var(--font-playfair)]">P</span>
+            <div className="w-11 h-11 rounded-2xl overflow-hidden shadow-md shadow-rosa-800/20 group-hover:shadow-rosa-800/30 transition-all duration-500 group-hover:scale-105">
+              <img src="/images/logo.jpg" alt="Pawil Nails" className="w-full h-full object-cover" />
             </div>
           </div>
           <div className="flex flex-col">

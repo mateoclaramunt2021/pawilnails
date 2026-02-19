@@ -13,8 +13,8 @@ export default function Footer() {
           {/* Brand */}
           <div className="md:col-span-4">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-rosa-500 to-rosa-700 flex items-center justify-center shadow-lg shadow-rosa-300/30">
-                <span className="text-white font-bold text-xl font-[var(--font-playfair)]">P</span>
+              <div className="w-12 h-12 rounded-2xl overflow-hidden shadow-lg shadow-rosa-300/30">
+                <img src="/images/logo.jpg" alt="Pawil Nails" className="w-full h-full object-cover" />
               </div>
               <div>
                 <span className="text-2xl font-bold font-[var(--font-playfair)] gradient-text">Pawil Nails</span>

@@ -5,10 +5,15 @@ export const metadata: Metadata = {
   title: "Pawil Nails — Spa de Uñas en Castelldefels",
   description: "Pawil Nails es un Spa de Uñas ubicado en Castelldefels. El mejor servicio, la mejor calidad, al mejor precio. Manicura, pedicura, acrílico, gel, nail art y más.",
   keywords: "uñas, manicura, pedicura, nail art, acrílico, gel, Castelldefels, Barcelona, spa uñas",
+  icons: {
+    icon: "/images/logo.jpg",
+    apple: "/images/logo.jpg",
+  },
   openGraph: {
     title: "Pawil Nails — Spa de Uñas en Castelldefels",
     description: "Tus uñas cuentan historias. El mejor servicio, la mejor calidad, al mejor precio.",
     type: "website",
+    images: ["/images/logo.jpg"],
   },
 };
 

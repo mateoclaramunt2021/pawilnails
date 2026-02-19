@@ -21,6 +21,10 @@ export default function Hero() {
 
       {/* Content */}
       <div className="relative z-10 text-center px-4 max-w-5xl mx-auto pt-20">
+        <div className="animate-fade-in-up mb-8">
+          <img src="/images/logo.jpg" alt="Pawil Nails" className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl mx-auto shadow-2xl shadow-black/30 border-2 border-white/20" />
+        </div>
+
         <div className="animate-fade-in-up">
           <span className="section-label !text-white/90 !bg-white/10 !border-white/20 backdrop-blur-xl mb-10 inline-flex">
             Spa de Uñas — Castelldefels
