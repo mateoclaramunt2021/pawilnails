@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Admin {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+}
+
+model ServiceCategory {
+  id        String    @id @default(uuid())
+  name      String
+  slug      String    @unique
+  image     String?
+  order     Int       @default(0)
+  createdAt DateTime  @default(now())
+  services  Service[]
+}
+
+model Service {
+  id          String          @id @default(uuid())
+  name        String
+  description String?
+  price       Float
+  duration    Int             @default(30)
+  active      Boolean         @default(true)
+  categoryId  String
+  category    ServiceCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  order       Int             @default(0)
+  createdAt   DateTime        @default(now())
+  bookings    Booking[]
+}
+
+model Client {
+  id        String    @id @default(uuid())
+  name      String
+  phone     String
+  email     String?
+  notes     String?
+  createdAt DateTime  @default(now())
+  bookings  Booking[]
+}
+
+model Booking {
+  id        String   @id @default(uuid())
+  date      String
+  time      String
+  status    String   @default("pendiente")
+  notes     String?
+  total     Float
+  serviceId String
+  service   Service  @relation(fields: [serviceId], references: [id])
+  clientId  String
+  client    Client   @relation(fields: [clientId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model BusinessConfig {
+  id        String @id @default(uuid())
+  key       String @unique
+  value     String
+}
+
+model BlockedDate {
+  id     String @id @default(uuid())
+  date   String
+  reason String?
+}
