@@ -1,3 +1,8 @@
 [build]
-  command = "chmod +x build-static.sh && ./build-static.sh"
+  command = "mv src/app/api src/app/_api_backup && printf 'export const prisma = null as any;\\nexport default prisma;\\n' > src/lib/db.ts && STATIC_EXPORT=true npx next build && mv src/app/_api_backup src/app/api"
   publish = "out"
+  ignore = "exit 1"
+
+[build.environment]
+  STATIC_EXPORT = "true"
+  NEXT_PLUGIN_FORCE_RUN = "false"
