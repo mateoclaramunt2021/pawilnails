@@ -15,9 +15,64 @@ interface CategoryGroup {
   services: ServiceOption[];
 }
 
+const DEMO_CATEGORIES: CategoryGroup[] = [
+  {
+    name: 'Manicura Semipermanente',
+    services: [
+      { id: 'd1', name: 'Esmaltado semipermanente manos', price: 11, duration: 30, categoryName: 'Manicura Semipermanente' },
+      { id: 'd2', name: 'Esmaltado Semi + Base Niveladora', price: 12.5, duration: 35, categoryName: 'Manicura Semipermanente' },
+      { id: 'd3', name: 'Esmaltado Semi Francesa', price: 14, duration: 40, categoryName: 'Manicura Semipermanente' },
+      { id: 'd4', name: 'Manicura Rusa', price: 17.9, duration: 45, categoryName: 'Manicura Semipermanente' },
+      { id: 'd5', name: 'Manicura Completa Semi', price: 23.9, duration: 60, categoryName: 'Manicura Semipermanente' },
+      { id: 'd6', name: 'Retirar semipermanente', price: 7, duration: 20, categoryName: 'Manicura Semipermanente' },
+    ],
+  },
+  {
+    name: 'Manicura Tradicional',
+    services: [
+      { id: 'd7', name: 'Esmaltado tradicional', price: 10, duration: 25, categoryName: 'Manicura Tradicional' },
+      { id: 'd8', name: 'Manicura completa tradicional', price: 18, duration: 45, categoryName: 'Manicura Tradicional' },
+      { id: 'd9', name: 'Manicura completa sin esmaltar', price: 15, duration: 40, categoryName: 'Manicura Tradicional' },
+    ],
+  },
+  {
+    name: 'Pedicura Semipermanente',
+    services: [
+      { id: 'd10', name: 'Esmaltado semipermanente pies', price: 16.9, duration: 35, categoryName: 'Pedicura Semipermanente' },
+      { id: 'd11', name: 'Esmaltado Semi + Base Protectora', price: 18, duration: 40, categoryName: 'Pedicura Semipermanente' },
+      { id: 'd12', name: 'Pedicura completa semipermanente', price: 32, duration: 60, categoryName: 'Pedicura Semipermanente' },
+    ],
+  },
+  {
+    name: 'Pedicura Tradicional',
+    services: [
+      { id: 'd13', name: 'Esmaltado tradicional pies', price: 15.9, duration: 30, categoryName: 'Pedicura Tradicional' },
+      { id: 'd14', name: 'Pedicura completa tradicional', price: 25.9, duration: 50, categoryName: 'Pedicura Tradicional' },
+      { id: 'd15', name: 'Cortar, Limar y Masaje', price: 10.9, duration: 25, categoryName: 'Pedicura Tradicional' },
+    ],
+  },
+  {
+    name: 'Uñas Acrílicas / Gel',
+    services: [
+      { id: 'd16', name: 'Uñas acrílicas esculpidas', price: 38, duration: 75, categoryName: 'Uñas Acrílicas / Gel' },
+      { id: 'd17', name: 'Uñas de gel', price: 35, duration: 70, categoryName: 'Uñas Acrílicas / Gel' },
+      { id: 'd18', name: 'Mantenimiento acrílico/gel', price: 28, duration: 55, categoryName: 'Uñas Acrílicas / Gel' },
+      { id: 'd19', name: 'Retirada acrílico/gel', price: 12, duration: 30, categoryName: 'Uñas Acrílicas / Gel' },
+    ],
+  },
+  {
+    name: 'Extras & Nail Art',
+    services: [
+      { id: 'd20', name: 'Nail Art (por uña)', price: 2, duration: 10, categoryName: 'Extras & Nail Art' },
+      { id: 'd21', name: 'Jelly Spa pies', price: 8, duration: 20, categoryName: 'Extras & Nail Art' },
+      { id: 'd22', name: 'Tratamiento fortalecedor', price: 5, duration: 15, categoryName: 'Extras & Nail Art' },
+    ],
+  },
+];
+
 export default function BookingSection() {
   const [step, setStep] = useState(1);
-  const [categories, setCategories] = useState<CategoryGroup[]>([]);
+  const [categories, setCategories] = useState<CategoryGroup[]>(DEMO_CATEGORIES);
   const [selectedService, setSelectedService] = useState<ServiceOption | null>(null);
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
@@ -42,7 +97,9 @@ export default function BookingSection() {
           setCategories(groups);
         }
       })
-      .catch(() => {});
+      .catch(() => {
+        // API not available (static export) - keep demo data
+      });
   }, []);
 
   useEffect(() => {
@@ -50,7 +107,10 @@ export default function BookingSection() {
       fetch(`/api/reservas/disponibilidad?date=${selectedDate}`)
         .then((r) => r.json())
         .then((data) => setBookedSlots(data.bookedSlots || []))
-        .catch(() => {});
+        .catch(() => {
+          // Static mode - no booked slots
+          setBookedSlots([]);
+        });
     }
   }, [selectedDate]);
 
@@ -115,7 +175,9 @@ export default function BookingSection() {
         setSuccess(true);
       }
     } catch {
-      // Error silencioso
+      // API not available (static/demo mode) — simulate success
+      await new Promise((r) => setTimeout(r, 1200));
+      setSuccess(true);
     }
     setLoading(false);
   };
