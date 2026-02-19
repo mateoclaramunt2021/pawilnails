@@ -7,7 +7,7 @@ export default function Hero() {
         style={{ backgroundImage: "url('/images/entrada.jpeg')" }}
       >
         <div className="absolute inset-0 bg-gradient-to-b from-rosa-950/90 via-rosa-900/75 to-rosa-800/50" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#FDFAF7] via-transparent to-transparent opacity-90" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#FFFAF7] via-transparent to-transparent opacity-90" />
         <div className="absolute inset-0 bg-gradient-to-r from-rosa-950/40 via-transparent to-rosa-950/40" />
       </div>
 
