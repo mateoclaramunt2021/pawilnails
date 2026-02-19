@@ -1,6 +1,6 @@
 export default function Hero() {
   return (
-    <section id="inicio" className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section id="inicio" className="relative min-h-screen flex items-center justify-center overflow-hidden shadow-[0_8px_40px_rgba(183,110,121,0.15),0_2px_12px_rgba(0,0,0,0.06)]">
       {/* Background image with cinematic overlay */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-105"
