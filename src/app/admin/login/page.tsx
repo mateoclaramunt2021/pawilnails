@@ -31,7 +31,13 @@ export default function AdminLogin() {
         setError(data.error || 'Error al iniciar sesión');
       }
     } catch {
-      setError('Error de conexión');
+      // Demo mode: accept hardcoded credentials when API is unavailable
+      if (email === 'admin@pawilnails.com' && password === 'pawilnails2026') {
+        sessionStorage.setItem('demo-admin', 'true');
+        router.push('/admin');
+      } else {
+        setError('Credenciales incorrectas');
+      }
     }
     setLoading(false);
   };

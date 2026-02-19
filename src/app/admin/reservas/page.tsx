@@ -20,11 +20,22 @@ const statusColors: Record<string, string> = {
   cancelada: 'bg-red-100 text-red-700 border-red-200',
 };
 
+const DEMO_BOOKINGS: Booking[] = [
+  { id: '1', date: '2026-02-19', time: '10:00', status: 'confirmada', total: 23.90, notes: null, service: { name: 'Manicura Completa Semi', category: { name: 'Manicura Semipermanente' } }, client: { name: 'María García', phone: '612 345 678', email: 'maria@email.com' } },
+  { id: '2', date: '2026-02-19', time: '11:30', status: 'pendiente', total: 17.90, notes: null, service: { name: 'Manicura Rusa', category: { name: 'Manicura Semipermanente' } }, client: { name: 'Laura López', phone: '634 567 890', email: null } },
+  { id: '3', date: '2026-02-19', time: '16:00', status: 'confirmada', total: 32.00, notes: 'Quiere color rojo', service: { name: 'Pedicura completa semipermanente', category: { name: 'Pedicura Semipermanente' } }, client: { name: 'Ana Martínez', phone: '655 789 012', email: 'ana@email.com' } },
+  { id: '4', date: '2026-02-18', time: '12:00', status: 'completada', total: 38.00, notes: null, service: { name: 'Uñas acrílicas esculpidas', category: { name: 'Uñas Acrílicas / Gel' } }, client: { name: 'Carmen Ruiz', phone: '678 901 234', email: 'carmen@email.com' } },
+  { id: '5', date: '2026-02-18', time: '09:30', status: 'completada', total: 11.00, notes: null, service: { name: 'Esmaltado semipermanente manos', category: { name: 'Manicura Semipermanente' } }, client: { name: 'Sofía Fernández', phone: '690 123 456', email: null } },
+  { id: '6', date: '2026-02-17', time: '15:00', status: 'cancelada', total: 25.90, notes: null, service: { name: 'Pedicura completa tradicional', category: { name: 'Pedicura Tradicional' } }, client: { name: 'Elena Sánchez', phone: '601 234 567', email: null } },
+  { id: '7', date: '2026-02-17', time: '10:30', status: 'completada', total: 14.00, notes: null, service: { name: 'Esmaltado Semi Francesa', category: { name: 'Manicura Semipermanente' } }, client: { name: 'Paula Moreno', phone: '623 456 789', email: 'paula@email.com' } },
+];
+
 export default function AdminReservas() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('');
   const [dateFilter, setDateFilter] = useState('');
+  const [isDemo, setIsDemo] = useState(false);
 
   const fetchBookings = () => {
     setLoading(true);
@@ -37,12 +48,23 @@ export default function AdminReservas() {
         setBookings(data.bookings || []);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => {
+        setIsDemo(true);
+        let demo = DEMO_BOOKINGS;
+        if (filter) demo = demo.filter((b) => b.status === filter);
+        if (dateFilter) demo = demo.filter((b) => b.date === dateFilter);
+        setBookings(demo);
+        setLoading(false);
+      });
   };
 
   useEffect(() => { fetchBookings(); }, [filter, dateFilter]);
 
   const updateStatus = async (id: string, status: string) => {
+    if (isDemo) {
+      setBookings((prev) => prev.map((b) => b.id === id ? { ...b, status } : b));
+      return;
+    }
     await fetch(`/api/reservas/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -53,6 +75,10 @@ export default function AdminReservas() {
 
   const deleteBooking = async (id: string) => {
     if (!confirm('¿Eliminar esta reserva?')) return;
+    if (isDemo) {
+      setBookings((prev) => prev.filter((b) => b.id !== id));
+      return;
+    }
     await fetch(`/api/reservas/${id}`, { method: 'DELETE' });
     fetchBookings();
   };

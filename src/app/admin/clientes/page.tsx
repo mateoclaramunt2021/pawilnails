@@ -28,6 +28,37 @@ const statusColors: Record<string, string> = {
   cancelada: 'bg-red-100 text-red-700',
 };
 
+const DEMO_CLIENTS: Client[] = [
+  { id: '1', name: 'María García', phone: '612 345 678', email: 'maria@email.com', notes: null, createdAt: '2025-11-15', bookings: [
+    { id: 'b1', date: '2026-02-19', time: '10:00', status: 'confirmada', total: 23.90, service: { name: 'Manicura Completa Semi' } },
+    { id: 'b2', date: '2026-01-28', time: '11:00', status: 'completada', total: 17.90, service: { name: 'Manicura Rusa' } },
+    { id: 'b3', date: '2025-12-20', time: '10:30', status: 'completada', total: 32.00, service: { name: 'Pedicura completa semi' } },
+  ]},
+  { id: '2', name: 'Laura López', phone: '634 567 890', email: null, notes: null, createdAt: '2025-12-03', bookings: [
+    { id: 'b4', date: '2026-02-19', time: '11:30', status: 'pendiente', total: 17.90, service: { name: 'Manicura Rusa' } },
+    { id: 'b5', date: '2026-01-15', time: '16:00', status: 'completada', total: 11.00, service: { name: 'Esmaltado semipermanente' } },
+  ]},
+  { id: '3', name: 'Ana Martínez', phone: '655 789 012', email: 'ana@email.com', notes: null, createdAt: '2026-01-10', bookings: [
+    { id: 'b6', date: '2026-02-19', time: '16:00', status: 'confirmada', total: 32.00, service: { name: 'Pedicura completa semi' } },
+  ]},
+  { id: '4', name: 'Carmen Ruiz', phone: '678 901 234', email: 'carmen@email.com', notes: null, createdAt: '2025-10-22', bookings: [
+    { id: 'b7', date: '2026-02-18', time: '12:00', status: 'completada', total: 38.00, service: { name: 'Uñas acrílicas esculpidas' } },
+    { id: 'b8', date: '2026-01-05', time: '10:00', status: 'completada', total: 28.00, service: { name: 'Mantenimiento acrílico' } },
+    { id: 'b9', date: '2025-12-01', time: '11:30', status: 'completada', total: 38.00, service: { name: 'Uñas acrílicas esculpidas' } },
+    { id: 'b10', date: '2025-11-05', time: '09:00', status: 'completada', total: 28.00, service: { name: 'Mantenimiento acrílico' } },
+  ]},
+  { id: '5', name: 'Sofía Fernández', phone: '690 123 456', email: null, notes: null, createdAt: '2026-02-01', bookings: [
+    { id: 'b11', date: '2026-02-18', time: '09:30', status: 'completada', total: 11.00, service: { name: 'Esmaltado semipermanente' } },
+  ]},
+  { id: '6', name: 'Elena Sánchez', phone: '601 234 567', email: null, notes: null, createdAt: '2026-01-20', bookings: [
+    { id: 'b12', date: '2026-02-17', time: '15:00', status: 'cancelada', total: 25.90, service: { name: 'Pedicura completa tradicional' } },
+  ]},
+  { id: '7', name: 'Paula Moreno', phone: '623 456 789', email: 'paula@email.com', notes: null, createdAt: '2025-11-30', bookings: [
+    { id: 'b13', date: '2026-02-17', time: '10:30', status: 'completada', total: 14.00, service: { name: 'Esmaltado Semi Francesa' } },
+    { id: 'b14', date: '2025-12-15', time: '12:00', status: 'completada', total: 23.90, service: { name: 'Manicura Completa Semi' } },
+  ]},
+];
+
 export default function AdminClientes() {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
@@ -41,7 +72,10 @@ export default function AdminClientes() {
         setClients(data.clients || []);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => {
+        setClients(DEMO_CLIENTS);
+        setLoading(false);
+      });
   }, []);
 
   const filtered = clients.filter(

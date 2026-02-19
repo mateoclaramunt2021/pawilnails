@@ -19,11 +19,36 @@ interface Category {
   services: Service[];
 }
 
+const DEMO_CATEGORIES: Category[] = [
+  { id: 'c1', name: 'Manicura Semipermanente', slug: 'manicura-semipermanente', services: [
+    { id: 's1', name: 'Esmaltado semipermanente manos', price: 11, duration: 30, active: true, description: null, order: 1 },
+    { id: 's2', name: 'Esmaltado Semi + Base Niveladora', price: 12.5, duration: 35, active: true, description: null, order: 2 },
+    { id: 's3', name: 'Esmaltado Semi Francesa', price: 14, duration: 40, active: true, description: null, order: 3 },
+    { id: 's4', name: 'Manicura Rusa', price: 17.9, duration: 45, active: true, description: null, order: 4 },
+    { id: 's5', name: 'Manicura Completa Semi', price: 23.9, duration: 50, active: true, description: null, order: 5 },
+    { id: 's6', name: 'Retirar semipermanente', price: 7, duration: 15, active: true, description: null, order: 6 },
+  ]},
+  { id: 'c2', name: 'Manicura Tradicional', slug: 'manicura-tradicional', services: [
+    { id: 's7', name: 'Esmaltado tradicional', price: 10, duration: 25, active: true, description: null, order: 1 },
+    { id: 's8', name: 'Manicura completa tradicional', price: 18, duration: 40, active: true, description: null, order: 2 },
+    { id: 's9', name: 'Manicura completa sin esmaltar', price: 15, duration: 35, active: true, description: null, order: 3 },
+  ]},
+  { id: 'c3', name: 'Pedicura Semipermanente', slug: 'pedicura-semipermanente', services: [
+    { id: 's10', name: 'Esmaltado semipermanente pies', price: 16.9, duration: 35, active: true, description: null, order: 1 },
+    { id: 's11', name: 'Pedicura completa semipermanente', price: 32, duration: 60, active: true, description: null, order: 2 },
+  ]},
+  { id: 'c4', name: 'Pedicura Tradicional', slug: 'pedicura-tradicional', services: [
+    { id: 's12', name: 'Esmaltado tradicional pies', price: 15.9, duration: 30, active: true, description: null, order: 1 },
+    { id: 's13', name: 'Pedicura completa tradicional', price: 25.9, duration: 50, active: true, description: null, order: 2 },
+  ]},
+];
+
 export default function AdminServicios() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingService, setEditingService] = useState<Service | null>(null);
   const [editForm, setEditForm] = useState({ name: '', price: 0, duration: 30, active: true });
+  const [isDemo, setIsDemo] = useState(false);
 
   const fetchServices = () => {
     setLoading(true);
@@ -33,7 +58,11 @@ export default function AdminServicios() {
         setCategories(data.categories || []);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => {
+        setIsDemo(true);
+        setCategories(DEMO_CATEGORIES);
+        setLoading(false);
+      });
   };
 
   useEffect(() => { fetchServices(); }, []);
@@ -50,6 +79,14 @@ export default function AdminServicios() {
 
   const saveEdit = async () => {
     if (!editingService) return;
+    if (isDemo) {
+      setCategories((prev) => prev.map((cat) => ({
+        ...cat,
+        services: cat.services.map((s) => s.id === editingService.id ? { ...s, ...editForm } : s),
+      })));
+      setEditingService(null);
+      return;
+    }
     await fetch(`/api/servicios/${editingService.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -60,6 +97,13 @@ export default function AdminServicios() {
   };
 
   const toggleActive = async (service: Service) => {
+    if (isDemo) {
+      setCategories((prev) => prev.map((cat) => ({
+        ...cat,
+        services: cat.services.map((s) => s.id === service.id ? { ...s, active: !s.active } : s),
+      })));
+      return;
+    }
     await fetch(`/api/servicios/${service.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -70,6 +114,13 @@ export default function AdminServicios() {
 
   const deleteService = async (id: string) => {
     if (!confirm('¿Eliminar este servicio? Esta acción no se puede deshacer.')) return;
+    if (isDemo) {
+      setCategories((prev) => prev.map((cat) => ({
+        ...cat,
+        services: cat.services.filter((s) => s.id !== id),
+      })));
+      return;
+    }
     await fetch(`/api/servicios/${id}`, { method: 'DELETE' });
     fetchServices();
   };

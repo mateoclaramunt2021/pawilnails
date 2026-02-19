@@ -8,11 +8,18 @@ interface BlockedDate {
   reason: string | null;
 }
 
+const DEMO_BLOCKED: BlockedDate[] = [
+  { id: 'bd1', date: '2026-03-19', reason: 'Fiesta de San José' },
+  { id: 'bd2', date: '2026-04-17', reason: 'Viernes Santo' },
+  { id: 'bd3', date: '2026-08-01', reason: 'Vacaciones de verano' },
+];
+
 export default function AdminConfiguracion() {
   const [blockedDates, setBlockedDates] = useState<BlockedDate[]>([]);
   const [newDate, setNewDate] = useState('');
   const [newReason, setNewReason] = useState('');
   const [loading, setLoading] = useState(true);
+  const [isDemo, setIsDemo] = useState(false);
 
   const fetchBlocked = () => {
     fetch('/api/horarios')
@@ -21,13 +28,23 @@ export default function AdminConfiguracion() {
         setBlockedDates(data.blocked || []);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => {
+        setIsDemo(true);
+        setBlockedDates(DEMO_BLOCKED);
+        setLoading(false);
+      });
   };
 
   useEffect(() => { fetchBlocked(); }, []);
 
   const addBlocked = async () => {
     if (!newDate) return;
+    if (isDemo) {
+      setBlockedDates((prev) => [...prev, { id: `bd-${Date.now()}`, date: newDate, reason: newReason || null }]);
+      setNewDate('');
+      setNewReason('');
+      return;
+    }
     await fetch('/api/horarios', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -39,6 +56,10 @@ export default function AdminConfiguracion() {
   };
 
   const removeBlocked = async (id: string) => {
+    if (isDemo) {
+      setBlockedDates((prev) => prev.filter((bd) => bd.id !== id));
+      return;
+    }
     await fetch(`/api/horarios?id=${id}`, { method: 'DELETE' });
     fetchBlocked();
   };

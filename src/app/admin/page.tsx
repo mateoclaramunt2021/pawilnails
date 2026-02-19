@@ -36,6 +36,35 @@ const statusLabels: Record<string, string> = {
   cancelada: 'Cancelada',
 };
 
+const DEMO_STATS: Stats = {
+  totalBookings: 47,
+  todayBookings: 3,
+  pendingBookings: 5,
+  totalClients: 32,
+  todayRevenue: 71.80,
+  monthlyRevenue: 1842.50,
+  popularServices: [
+    { serviceName: 'Manicura Completa Semi', _count: 18 },
+    { serviceName: 'Manicura Rusa', _count: 12 },
+    { serviceName: 'Pedicura completa semipermanente', _count: 8 },
+    { serviceName: 'Esmaltado semipermanente manos', _count: 6 },
+    { serviceName: 'Uñas acrílicas esculpidas', _count: 3 },
+  ],
+  recentBookings: [
+    { id: '1', date: '2026-02-19', time: '10:00', status: 'confirmada', total: 23.90, service: { name: 'Manicura Completa Semi' }, client: { name: 'María García', phone: '612 345 678' } },
+    { id: '2', date: '2026-02-19', time: '11:30', status: 'pendiente', total: 17.90, service: { name: 'Manicura Rusa' }, client: { name: 'Laura López', phone: '634 567 890' } },
+    { id: '3', date: '2026-02-19', time: '16:00', status: 'confirmada', total: 32.00, service: { name: 'Pedicura completa semi' }, client: { name: 'Ana Martínez', phone: '655 789 012' } },
+    { id: '4', date: '2026-02-18', time: '12:00', status: 'completada', total: 38.00, service: { name: 'Uñas acrílicas esculpidas' }, client: { name: 'Carmen Ruiz', phone: '678 901 234' } },
+    { id: '5', date: '2026-02-18', time: '09:30', status: 'completada', total: 11.00, service: { name: 'Esmaltado semipermanente' }, client: { name: 'Sofía Fernández', phone: '690 123 456' } },
+  ],
+  bookingsByStatus: [
+    { status: 'completada', _count: 28 },
+    { status: 'confirmada', _count: 10 },
+    { status: 'pendiente', _count: 5 },
+    { status: 'cancelada', _count: 4 },
+  ],
+};
+
 export default function AdminDashboard() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -47,7 +76,10 @@ export default function AdminDashboard() {
         setStats(data);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => {
+        setStats(DEMO_STATS);
+        setLoading(false);
+      });
   }, []);
 
   if (loading) {

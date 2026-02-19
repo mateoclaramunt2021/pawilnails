@@ -67,16 +67,29 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     fetch('/api/auth/check')
       .then((r) => {
         if (!r.ok) {
+          // Check demo mode
+          if (typeof window !== 'undefined' && sessionStorage.getItem('demo-admin') === 'true') {
+            setAuthenticated(true);
+            return;
+          }
           router.push('/admin/login');
           return;
         }
         setAuthenticated(true);
       })
-      .catch(() => router.push('/admin/login'));
+      .catch(() => {
+        // API unavailable — check demo mode
+        if (typeof window !== 'undefined' && sessionStorage.getItem('demo-admin') === 'true') {
+          setAuthenticated(true);
+          return;
+        }
+        router.push('/admin/login');
+      });
   }, [pathname, router]);
 
   const handleLogout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
+    try { await fetch('/api/auth/logout', { method: 'POST' }); } catch {}
+    if (typeof window !== 'undefined') sessionStorage.removeItem('demo-admin');
     router.push('/admin/login');
   };
 
