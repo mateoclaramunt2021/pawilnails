@@ -24,7 +24,7 @@ export default function Navbar() {
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 ${
         scrolled
-          ? 'glass shadow-xl shadow-rosa-200/10 py-2.5'
+          ? 'glass shadow-lg shadow-rosa-900/5 py-2.5'
           : 'bg-transparent py-5'
       }`}
     >
@@ -32,8 +32,8 @@ export default function Navbar() {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3 group">
           <div className="relative">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-rosa-500 to-rosa-700 flex items-center justify-center shadow-lg shadow-rosa-400/30 group-hover:shadow-rosa-400/50 transition-all duration-500 group-hover:scale-105 group-hover:rotate-3">
-              <span className="text-white font-bold text-lg font-[var(--font-playfair)]">P</span>
+            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-rosa-600 to-rosa-800 flex items-center justify-center shadow-md shadow-rosa-800/20 group-hover:shadow-rosa-800/30 transition-all duration-500 group-hover:scale-105">
+              <span className="text-crema-50 font-bold text-lg font-[var(--font-playfair)]">P</span>
             </div>
           </div>
           <div className="flex flex-col">
@@ -43,7 +43,7 @@ export default function Navbar() {
               Pawil Nails
             </span>
             <span className={`text-[10px] tracking-[0.2em] uppercase font-medium transition-colors duration-500 ${
-              scrolled ? 'text-rosa-400' : 'text-white/60'
+              scrolled ? 'text-rosa-500' : 'text-white/60'
             }`}>
               Spa de Uñas
             </span>
@@ -58,13 +58,13 @@ export default function Navbar() {
               href={link.href}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-500 relative group ${
                 scrolled
-                  ? 'text-rosa-900/70 hover:text-rosa-600 hover:bg-rosa-50'
+                  ? 'text-rosa-800/70 hover:text-rosa-700 hover:bg-rosa-100/60'
                   : 'text-white/80 hover:text-white hover:bg-white/10'
               }`}
             >
               {link.label}
               <span className={`absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] w-0 group-hover:w-6 transition-all duration-300 rounded-full ${
-                scrolled ? 'bg-rosa-500' : 'bg-white/70'
+                scrolled ? 'bg-rosa-600' : 'bg-white/70'
               }`} />
             </a>
           ))}
@@ -90,13 +90,13 @@ export default function Navbar() {
         >
           <div className="w-6 h-5 flex flex-col justify-between">
             <span className={`block h-0.5 rounded-full transition-all duration-300 ${menuOpen ? 'rotate-45 translate-y-2' : ''} ${
-              scrolled ? 'bg-rosa-800' : 'bg-white'
+              scrolled ? 'bg-rosa-700' : 'bg-white'
             }`} />
             <span className={`block h-0.5 rounded-full transition-all duration-300 ${menuOpen ? 'opacity-0 scale-0' : ''} ${
-              scrolled ? 'bg-rosa-800' : 'bg-white'
+              scrolled ? 'bg-rosa-700' : 'bg-white'
             }`} />
             <span className={`block h-0.5 rounded-full transition-all duration-300 ${menuOpen ? '-rotate-45 -translate-y-2' : ''} ${
-              scrolled ? 'bg-rosa-800' : 'bg-white'
+              scrolled ? 'bg-rosa-700' : 'bg-white'
             }`} />
           </div>
         </button>
@@ -108,13 +108,13 @@ export default function Navbar() {
           menuOpen ? 'max-h-[400px] opacity-100' : 'max-h-0 opacity-0'
         }`}
       >
-        <div className="glass mx-4 mt-3 rounded-3xl p-7 space-y-2 shadow-2xl shadow-rosa-200/20 border border-rosa-100/50">
+        <div className="glass mx-4 mt-3 rounded-3xl p-7 space-y-2 shadow-xl shadow-rosa-900/5 border border-rosa-200/40">
           {navLinks.map((link) => (
             <a
               key={link.href}
               href={link.href}
               onClick={() => setMenuOpen(false)}
-              className="block text-rosa-900 font-medium hover:text-rosa-600 transition-all duration-300 py-3 px-4 rounded-xl hover:bg-rosa-50"
+              className="block text-rosa-800 font-medium hover:text-rosa-600 transition-all duration-300 py-3 px-4 rounded-xl hover:bg-rosa-100/60"
             >
               {link.label}
             </a>
