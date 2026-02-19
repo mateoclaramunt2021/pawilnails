@@ -70,10 +70,13 @@ const DEMO_CATEGORIES: CategoryGroup[] = [
   },
 ];
 
+const formatPrice = (price: number) =>
+  price % 1 === 0 ? price + '€' : price.toFixed(2).replace('.', ',') + '€';
+
 export default function BookingSection() {
   const [step, setStep] = useState(1);
   const [categories, setCategories] = useState<CategoryGroup[]>(DEMO_CATEGORIES);
-  const [selectedService, setSelectedService] = useState<ServiceOption | null>(null);
+  const [selectedServices, setSelectedServices] = useState<ServiceOption[]>([]);
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
   const [bookedSlots, setBookedSlots] = useState<string[]>([]);
@@ -81,6 +84,17 @@ export default function BookingSection() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(new Date());
+
+  const totalPrice = selectedServices.reduce((sum, s) => sum + s.price, 0);
+  const totalDuration = selectedServices.reduce((sum, s) => sum + s.duration, 0);
+
+  const toggleService = (service: ServiceOption) => {
+    setSelectedServices((prev) =>
+      prev.find((s) => s.id === service.id)
+        ? prev.filter((s) => s.id !== service.id)
+        : [...prev, service]
+    );
+  };
 
   useEffect(() => {
     fetch('/api/servicios')
@@ -155,20 +169,21 @@ export default function BookingSection() {
   };
 
   const handleSubmit = async () => {
-    if (!selectedService || !selectedDate || !selectedTime || !clientData.name || !clientData.phone) return;
+    if (selectedServices.length === 0 || !selectedDate || !selectedTime || !clientData.name || !clientData.phone) return;
     setLoading(true);
     try {
       const res = await fetch('/api/reservas', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          serviceId: selectedService.id,
+          serviceId: selectedServices[0].id,
+          services: selectedServices.map((s) => s.id),
           date: selectedDate,
           time: selectedTime,
           clientName: clientData.name,
           clientPhone: clientData.phone,
           clientEmail: clientData.email,
-          total: selectedService.price,
+          total: totalPrice,
         }),
       });
       if (res.ok) {
@@ -202,9 +217,21 @@ export default function BookingSection() {
             <h3 className="text-3xl sm:text-4xl font-bold font-[var(--font-playfair)] text-rosa-950 mb-5">
               ¡Reserva Confirmada!
             </h3>
-            <p className="text-rosa-700/60 mb-2 text-lg">
-              Tu cita para <strong className="text-rosa-800">{selectedService?.name}</strong> ha sido registrada.
-            </p>
+            <div className="text-rosa-700/60 mb-2 text-lg">
+              {selectedServices.length === 1 ? (
+                <p>Tu cita para <strong className="text-rosa-800">{selectedServices[0].name}</strong> ha sido registrada.</p>
+              ) : (
+                <div>
+                  <p className="mb-3">Tus servicios han sido registrados:</p>
+                  <ul className="text-sm space-y-1 mb-2">
+                    {selectedServices.map((s) => (
+                      <li key={s.id} className="text-rosa-800 font-medium">• {s.name} — {formatPrice(s.price)}</li>
+                    ))}
+                  </ul>
+                  <p className="font-bold gradient-text text-lg">Total: {formatPrice(totalPrice)}</p>
+                </div>
+              )}
+            </div>
             <p className="text-rosa-600 font-semibold mb-8 text-lg">
               {selectedDate.split('-').reverse().join('/')} a las {selectedTime}
             </p>
@@ -216,7 +243,7 @@ export default function BookingSection() {
               onClick={() => {
                 setSuccess(false);
                 setStep(1);
-                setSelectedService(null);
+                setSelectedServices([]);
                 setSelectedDate('');
                 setSelectedTime('');
                 setClientData({ name: '', phone: '', email: '' });
@@ -291,41 +318,110 @@ export default function BookingSection() {
         </div>
 
         <div className="bg-white rounded-[2rem] shadow-2xl shadow-rosa-100/30 border border-rosa-100/60 overflow-hidden">
-          {/* Step 1: Select Service */}
+          {/* Step 1: Select Services */}
           {step === 1 && (
             <div className="p-8 sm:p-10">
-              <h3 className="text-xl font-bold text-rosa-900 font-[var(--font-playfair)] mb-8">
-                1. Selecciona tu servicio
-              </h3>
-              <div className="space-y-8 max-h-[500px] overflow-y-auto pr-2">
+              <div className="flex items-center justify-between mb-8">
+                <h3 className="text-xl font-bold text-rosa-900 font-[var(--font-playfair)]">
+                  1. Selecciona tus servicios
+                </h3>
+                {selectedServices.length > 0 && (
+                  <span className="text-xs font-bold text-rosa-500 bg-rosa-50 px-3 py-1.5 rounded-full border border-rosa-200/50">
+                    {selectedServices.length} seleccionado{selectedServices.length > 1 ? 's' : ''}
+                  </span>
+                )}
+              </div>
+              <div className="space-y-8 max-h-[420px] overflow-y-auto pr-2">
                 {categories.map((cat) => (
                   <div key={cat.name}>
                     <h4 className="text-xs font-bold text-rosa-400 uppercase tracking-[0.15em] mb-4">
                       {cat.name}
                     </h4>
                     <div className="grid sm:grid-cols-2 gap-2.5">
-                      {cat.services.map((service) => (
-                        <button
-                          key={service.id}
-                          onClick={() => {
-                            setSelectedService(service);
-                            setStep(2);
-                          }}
-                          className={`text-left p-4 rounded-2xl border transition-all duration-300 hover:border-rosa-400/60 hover:bg-rosa-50/80 hover:shadow-sm group ${
-                            selectedService?.id === service.id
-                              ? 'border-rosa-500 bg-rosa-50 shadow-sm shadow-rosa-100/50'
-                              : 'border-rosa-100/70'
-                          }`}
-                        >
-                          <div className="font-medium text-rosa-900/80 text-sm group-hover:text-rosa-700 transition-colors">{service.name}</div>
-                          <div className="text-rosa-500 font-bold mt-1.5 text-sm">
-                            {service.price % 1 === 0 ? service.price + '€' : service.price.toFixed(2).replace('.', ',') + '€'}
-                          </div>
-                        </button>
-                      ))}
+                      {cat.services.map((service) => {
+                        const isSelected = selectedServices.some((s) => s.id === service.id);
+                        return (
+                          <button
+                            key={service.id}
+                            onClick={() => toggleService(service)}
+                            className={`text-left p-4 rounded-2xl border transition-all duration-300 hover:border-rosa-400/60 hover:bg-rosa-50/80 hover:shadow-sm group relative ${
+                              isSelected
+                                ? 'border-rosa-500 bg-rosa-50 shadow-sm shadow-rosa-100/50'
+                                : 'border-rosa-100/70'
+                            }`}
+                          >
+                            {isSelected && (
+                              <div className="absolute top-3 right-3 w-5 h-5 bg-gradient-to-br from-rosa-500 to-rosa-600 rounded-full flex items-center justify-center">
+                                <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                </svg>
+                              </div>
+                            )}
+                            <div className="font-medium text-rosa-900/80 text-sm group-hover:text-rosa-700 transition-colors pr-6">{service.name}</div>
+                            <div className="flex items-center gap-2 mt-1.5">
+                              <span className="text-rosa-500 font-bold text-sm">{formatPrice(service.price)}</span>
+                              <span className="text-rosa-300 text-xs">· {service.duration} min</span>
+                            </div>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 ))}
+              </div>
+
+              {/* Selected services summary / cart */}
+              {selectedServices.length > 0 && (
+                <div className="mt-8 bg-gradient-to-br from-rosa-50 to-nude-50 rounded-2xl p-6 border border-rosa-100/40">
+                  <div className="flex items-center justify-between mb-4">
+                    <h4 className="text-xs font-bold text-rosa-400 uppercase tracking-[0.15em]">Tu selección</h4>
+                    <button
+                      onClick={() => setSelectedServices([])}
+                      className="text-xs text-rosa-400 hover:text-rosa-600 transition-colors"
+                    >
+                      Limpiar todo
+                    </button>
+                  </div>
+                  <div className="space-y-2 mb-4">
+                    {selectedServices.map((s) => (
+                      <div key={s.id} className="flex items-center justify-between text-sm">
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => toggleService(s)}
+                            className="w-5 h-5 rounded-full bg-rosa-100 hover:bg-rosa-200 flex items-center justify-center text-rosa-500 transition-colors shrink-0"
+                          >
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                          <span className="text-rosa-800">{s.name}</span>
+                        </div>
+                        <span className="text-rosa-500 font-semibold">{formatPrice(s.price)}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="h-px bg-gradient-to-r from-transparent via-rosa-200 to-transparent mb-4" />
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-sm text-rosa-600 font-semibold">Total</span>
+                      <span className="text-xs text-rosa-400 ml-2">~{totalDuration} min</span>
+                    </div>
+                    <span className="text-xl font-bold gradient-text">{formatPrice(totalPrice)}</span>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex justify-end mt-8">
+                <button
+                  onClick={() => setStep(2)}
+                  disabled={selectedServices.length === 0}
+                  className="btn-premium px-10 py-3.5 rounded-full disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2.5"
+                >
+                  Continuar
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
               </div>
             </div>
           )}
@@ -337,10 +433,11 @@ export default function BookingSection() {
                 2. Selecciona la fecha
               </h3>
               <p className="text-sm text-rosa-500/70 mb-8">
-                Servicio: <strong className="text-rosa-700">{selectedService?.name}</strong> —{' '}
-                <strong className="gradient-text">
-                  {selectedService && (selectedService.price % 1 === 0 ? selectedService.price + '€' : selectedService.price.toFixed(2).replace('.', ',') + '€')}
-                </strong>
+                {selectedServices.length === 1 ? (
+                  <>Servicio: <strong className="text-rosa-700">{selectedServices[0].name}</strong> — <strong className="gradient-text">{formatPrice(totalPrice)}</strong></>
+                ) : (
+                  <><strong className="text-rosa-700">{selectedServices.length} servicios</strong> — <strong className="gradient-text">{formatPrice(totalPrice)}</strong></>
+                )}
               </p>
 
               {/* Calendar */}
@@ -419,7 +516,7 @@ export default function BookingSection() {
                 3. Selecciona la hora
               </h3>
               <p className="text-sm text-rosa-500/70 mb-8">
-                {selectedDate.split('-').reverse().join('/')} — {selectedService?.name}
+                {selectedDate.split('-').reverse().join('/')} — {selectedServices.length === 1 ? selectedServices[0].name : `${selectedServices.length} servicios`} — <strong className="gradient-text">{formatPrice(totalPrice)}</strong>
               </p>
 
               <div className="grid grid-cols-4 sm:grid-cols-6 gap-3 max-w-lg mx-auto">
@@ -459,10 +556,19 @@ export default function BookingSection() {
               {/* Summary */}
               <div className="bg-gradient-to-br from-rosa-50 to-nude-50 rounded-2xl p-7 mb-10 border border-rosa-100/40">
                 <h4 className="text-xs font-bold text-rosa-400 uppercase tracking-[0.15em] mb-4">Resumen de tu cita</h4>
+                <div className="space-y-3 mb-5">
+                  {selectedServices.map((s) => (
+                    <div key={s.id} className="flex items-center justify-between text-sm">
+                      <span className="text-rosa-800 font-medium">{s.name}</span>
+                      <span className="text-rosa-500 font-semibold">{formatPrice(s.price)}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="h-px bg-gradient-to-r from-transparent via-rosa-200 to-transparent mb-4" />
                 <div className="grid sm:grid-cols-3 gap-4">
                   <div>
-                    <span className="text-xs text-rosa-400">Servicio</span>
-                    <p className="font-semibold text-rosa-800 text-sm">{selectedService?.name}</p>
+                    <span className="text-xs text-rosa-400">Servicios</span>
+                    <p className="font-semibold text-rosa-800 text-sm">{selectedServices.length} servicio{selectedServices.length > 1 ? 's' : ''} · ~{totalDuration} min</p>
                   </div>
                   <div>
                     <span className="text-xs text-rosa-400">Fecha y hora</span>
@@ -471,10 +577,8 @@ export default function BookingSection() {
                     </p>
                   </div>
                   <div>
-                    <span className="text-xs text-rosa-400">Precio</span>
-                    <p className="font-bold gradient-text text-lg">
-                      {selectedService && (selectedService.price % 1 === 0 ? selectedService.price + '€' : selectedService.price.toFixed(2).replace('.', ',') + '€')}
-                    </p>
+                    <span className="text-xs text-rosa-400">Total</span>
+                    <p className="font-bold gradient-text text-lg">{formatPrice(totalPrice)}</p>
                   </div>
                 </div>
               </div>
